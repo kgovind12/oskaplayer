@@ -243,14 +243,14 @@ function moveRight(currState, player, position) {
 function jumpLeft(currState, player, position) {
     const newState = currState.map(row => [...row]);
     const [i, j] = position;
-    const middle = Math.floor(currState.length / 2);
+    const middle = Math.floor(currState.length / 2); //2
     newState[i][j] = "-";
 
     if (player === "w" && i < middle - 1) {
         newState[i + 1][j - 1] = "-";
         newState[i + 2][j - 2] = player;
     } else if (player === "w" && i === middle - 1) {
-        newState[i + 1][j] = "-";
+        newState[i + 1][j - 1] = "-";
         newState[i + 2][j - 1] = player;
     } else if (player === "w" && i >= middle) {
         newState[i + 1][j] = "-";
@@ -263,7 +263,7 @@ function jumpLeft(currState, player, position) {
         newState[i - 2][j - 1] = player;
     } else if (player === "b" && i <= middle) {
         newState[i - 1][j] = "-";
-        newState[i - 2][j - 1] = player;
+        newState[i - 2][j] = player;
     }
 
     return newState;
@@ -581,13 +581,13 @@ const boards = [board1, board2, board3, board4, board5];
 const player = "w"; // or "b"
 const depth = 3; // depth can be tuned for performance vs strength
 
-boards.forEach((board, index) => {
-  console.log(`\nTest Case ${index + 1}:`);
-  console.log("Current board:");
-  printBoard(board);
+// boards.forEach((board, index) => {
+//   console.log(`\nTest Case ${index + 1}:`);
+//   console.log("Current board:");
+//   printBoard(board);
   
-  const nextMove = oskaplayer(board, player, depth);
+//   const nextMove = oskaplayer(board, player, depth);
   
-  console.log("AI's chosen move:");
-  printBoard(nextMove);
-});
+//   console.log("AI's chosen move:");
+//   printBoard(nextMove);
+// });

@@ -1,10 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Oska AI Test</title>
+  <meta charset="UTF-8">
+  <title>Oska Game</title>
+  <link rel="stylesheet" href="styles.css">
   <script defer src="script.js"></script>
+  <script defer src="oskaplayer.js"></script>
 </head>
 <body>
-  <h1>Check the console for AI move</h1>
+  <h1>Oska Game</h1>
+  <div class="board" id="board">
+    <div class="row" id="row0">
+        <div class="col" id="pos-00" piece="w"></div>
+        <div class="col" id="pos-01" piece="w"></div>
+        <div class="col" id="pos-02" piece="w"></div>
+        <div class="col" id="pos-03" piece="w"></div>
+    </div>
+    <div class="row" id="row1">
+        <div class="col" id="pos-10" piece="-"></div>
+        <div class="col" id="pos-11" piece="-"></div>
+        <div class="col" id="pos-12" piece="-"></div>
+    </div>
+    <div class="row" id="row2">
+        <div class="col" id="pos-20" piece="-"></div>
+        <div class="col" id="pos-21" piece="-"></div>
+    </div>
+    <div class="row" id="row3">
+        <div class="col" id="pos-30" piece="-"></div>
+        <div class="col" id="pos-31" piece="-"></div>
+        <div class="col" id="pos-32" piece="-"></div>
+    </div>
+    <div class="row" id="row4">
+        <div class="col" id="pos-40" piece="b"></div>
+        <div class="col" id="pos-41" piece="b"></div>
+        <div class="col" id="pos-42" piece="b"></div>
+        <div class="col" id="pos-43" piece="b"></div>
+    </div>
+  </div>
 </body>
 </html>
