@@ -1,5 +1,6 @@
 let selectedPiece = null;
 let legalMoves = [];
+let depth = 3;
 
 attachBlackPieceListeners();
 
@@ -43,7 +44,7 @@ function attachBlackPieceListeners() {
               console.log("Player moved:");
               printBoard(updatedBoard);
 
-              const aiMove = oskaplayer(updatedBoard, 'w', 3);
+              const aiMove = oskaplayer(updatedBoard, 'w', depth);
               console.log("AI move:");
               printBoard(aiMove);
 
