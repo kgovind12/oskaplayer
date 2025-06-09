@@ -1,76 +1,79 @@
 body {
-  font-family: sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: #f2f2f2;
-  margin: 0;
-  padding: 20px;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f2f2f2;
+    margin: 0;
+    height: 100vh;
 }
 
 h1 {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
+    position: absolute;
+    top: 30px;
 }
 
 .board {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .row {
-  display: flex;
-  justify-content: center; /* center-align rows */
-  gap: 5px;
+    display: flex;
+    justify-content: center; /* center-align rows */
+    gap: 5px;
 }
 
 .col {
-  width: 50px;
-  height: 50px;
-  background-color: beige;
-  border: 1px solid #999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  position: relative;
+    width: 70px;
+    height: 70px;
+    background-color: beige;
+    border: 1px solid #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    position: relative;
 }
 
 /* White piece */
 .col[piece="w"]::before {
-  content: "";
-  width: 20px;
-  height: 20px;
-  background-color: white;
-  border-radius: 50%;
-  border: 1px solid #444;
-  position: absolute;
+    content: "";
+    width: 35px;
+    height: 35px;
+    background-color: white;
+    border-radius: 50%;
+    border: 1px solid #444;
+    position: absolute;
 }
 
 /* Black piece */
 .col[piece="b"]::before {
-  content: "";
-  width: 20px;
-  height: 20px;
-  background-color: black;
-  border-radius: 50%;
-  border: 1px solid #444;
-  position: absolute;
+    content: "";
+    width: 35px;
+    height: 35px;
+    background-color: black;
+    border-radius: 50%;
+    border: 1px solid #444;
+    position: absolute;
 }
 
 .col[piece="b"]:hover {
-  outline: 2px solid yellow;
-  cursor: pointer;
+    outline: 2px solid yellow;
+    cursor: pointer;
 }
 
 .col.selected {
-  outline: 3px solid yellow;
+    outline: 3px solid yellow;
 }
 
 .col.highlight {
-  outline: 3px dashed yellow;
+    outline: 3px dashed yellow;
 }
 
 .col.highlight:hover {
-  cursor: pointer;
+    cursor: pointer;
 }

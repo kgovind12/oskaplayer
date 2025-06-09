@@ -1,4 +1,5 @@
 // Generates all valid next states for a given player on the board
+// Returns a list of boards representing the next possible moves
 function movegen(board, player) {
     return generateNewStates(board, player);
 }
@@ -11,19 +12,22 @@ function generateNewStates(currState, player) {
             if (currState[i][j] === player) {
                 const position = [i, j];
 
-                if (moveable(currState, player, position).includes("left")) {
+                const possibleMoves = moveable(currState, player, position);
+                const possibleJumps = jumpable(currState, player, position);
+
+                if (possibleMoves.some(obj => obj.move === "left")) {
                     const leftMove = moveLeft(currState, player, position);
                     newStates.push(leftMove);
                 }
-                if (moveable(currState, player, position).includes("right")) {
+                if (possibleMoves.some(obj => obj.move === "right")) {
                     const rightMove = moveRight(currState, player, position);
                     newStates.push(rightMove);
                 }
-                if (jumpable(currState, player, position).includes("left")) {
+                if (possibleJumps.some(obj => obj.move === "left")) {
                     const leftJump = jumpLeft(currState, player, position);
                     newStates.push(leftJump);
                 }
-                if (jumpable(currState, player, position).includes("right")) {
+                if (possibleJumps.some(obj => obj.move === "right")) {
                     const rightJump = jumpRight(currState, player, position);
                     newStates.push(rightJump);
                 }
@@ -33,6 +37,31 @@ function generateNewStates(currState, player) {
     return newStates;
 }
 
+// Returns a list of the new [i,j] positions that a player can move to
+// Used to highlight the squares that the player can move to next
+function generateLegalMoves(currState, player, position) {
+    const legalMoves = [];
+
+    if (moveable(currState, player, position).move.includes("left")) {
+        const leftMove = moveLeft(currState, player, position);
+        legalMoves.push({ move: "leftMove", newPos: leftMove.newPos });
+    }
+    if (moveable(currState, player, position).move.includes("right")) {
+        const rightMove = moveRight(currState, player, position);
+        legalMoves.push({ move: "rightMove", newPos: rightMove.newPos });
+    }
+    if (jumpable(currState, player, position).move.includes("left")) {
+        const leftJump = jumpLeft(currState, player, position);
+        legalMoves.push({ move: "leftJump", newPos: leftJump.newPos });
+    }
+    if (jumpable(currState, player, position).move.includes("right")) {
+        const rightJump = jumpRight(currState, player, position);
+        legalMoves.push({ move: "rightJump", newPos: rightJump.newPos });
+    }
+
+    return legalMoves;
+}
+
 function moveable(currState, player, position) {
     const moveable = [];
     const [i, j] = position;
@@ -40,27 +69,27 @@ function moveable(currState, player, position) {
 
     if (player === "w") {
         if (i < middle && j !== 0 && currState[i + 1][j - 1] === "-") {
-            moveable.push("left");
+            moveable.push({ move: "left", newPos: [i + 1, j - 1] });
         } else if (i >= middle && i !== currState.length - 1 && currState[i + 1][j] === "-") {
-            moveable.push("left");
+            moveable.push({ move: "left", newPos: [i + 1, j] });
         }
 
         if (i < middle && j !== currState[i].length - 1 && currState[i + 1][j] === "-") {
-            moveable.push("right");
+            moveable.push({ move: "right", newPos: [i + 1, j] });
         } else if (i >= middle && i !== currState.length - 1 && currState[i + 1][j + 1] === "-") {
-            moveable.push("right");
+            moveable.push({ move: "right", newPos: [i + 1, j + 1] });
         }
     } else if (player === "b") {
         if (i > middle && j !== 0 && currState[i - 1][j - 1] === "-") {
-            moveable.push("left");
+            moveable.push({ move: "left", newPos: [i - 1, j - 1] });
         } else if (i <= middle && i !== 0 && currState[i - 1][j] === "-") {
-            moveable.push("left");
+            moveable.push({ move: "left", newPos: [i - 1, j] });
         }
 
         if (i > middle && j !== currState[i].length - 1 && currState[i - 1][j] === "-") {
-            moveable.push("right");
+            moveable.push({ move: "right", newPos: [i - 1, j] });
         } else if (i <= middle && i !== 0 && currState[i - 1][j + 1] === "-") {
-            moveable.push("right");
+            moveable.push({ move: "right", newPos: [i - 1, j + 1] });
         }
     }
 
@@ -81,7 +110,7 @@ function jumpable(currState, player, position) {
             currState[i + 1][j - 1] === "b" &&
             currState[i + 2][j - 2] === "-"
         ) {
-            jumpable.push("left");
+            jumpable.push({ move: "left", newPos: [i + 2, j - 2] });
         }
         // Jump left - below or equal middle row (including immediate above middle special case)
         else if (
@@ -91,7 +120,7 @@ function jumpable(currState, player, position) {
             currState[i + 1][j] === "b" &&
             currState[i + 2][j] === "-"
         ) {
-            jumpable.push("left");
+            jumpable.push({ move: "left", newPos: [i + 2, j] });
         }
         // Jump right - not immediate above middle row
         if (
@@ -101,7 +130,7 @@ function jumpable(currState, player, position) {
             currState[i + 1][j] === "b" &&
             currState[i + 2][j] === "-"
         ) {
-            jumpable.push("right");
+            jumpable.push({ move: "right", newPos: [i + 2, j] });
         }
         // Jump right - below or equal middle row (including immediate above middle special case)
         else if (
@@ -111,7 +140,7 @@ function jumpable(currState, player, position) {
             currState[i + 1][j + 1] === "b" &&
             currState[i + 2][j + 2] === "-"
         ) {
-            jumpable.push("right");
+            jumpable.push({ move: "right", newPos: [i + 2, j + 2] });
         }
         // Special case: immediately above middle row jump left
         if (
@@ -121,7 +150,7 @@ function jumpable(currState, player, position) {
             currState[i + 1][j - 1] === "b" &&
             currState[i + 2][j - 1] === "-"
         ) {
-            jumpable.push("left");
+            jumpable.push({ move: "left", newPos: [i + 2, j - 1] });
         }
         // Special case: immediately above middle row jump right
         if (
@@ -131,7 +160,7 @@ function jumpable(currState, player, position) {
             currState[i + 1][j] === "b" &&
             currState[i + 2][j + 1] === "-"
         ) {
-            jumpable.push("right");
+            jumpable.push({ move: "right", newPos: [i + 2, j + 1] });
         }
     } else if (player === "b") {
         // Jump left - below immediate middle row
@@ -142,7 +171,7 @@ function jumpable(currState, player, position) {
             currState[i - 1][j - 1] === "w" &&
             currState[i - 2][j - 2] === "-"
         ) {
-            jumpable.push("left");
+            jumpable.push({ move: "left", newPos: [i - 2, j - 2] });
         }
         // Jump left - above or equal middle row
         else if (
@@ -152,9 +181,9 @@ function jumpable(currState, player, position) {
             currState[i - 1][j] === "w" &&
             currState[i - 2][j] === "-"
         ) {
-            jumpable.push("left");
+            jumpable.push({ move: "left", newPos: [i - 2, j] });
         }
-        // Jump right - below immediate middle row
+        // Jump right - immediately below middle row
         if (
             i > middle + 1 &&
             i - 2 >= 0 &&
@@ -162,7 +191,7 @@ function jumpable(currState, player, position) {
             currState[i - 1][j] === "w" &&
             currState[i - 2][j] === "-"
         ) {
-            jumpable.push("right");
+            jumpable.push({ move: "right", newPos: [i - 2, j] });
         }
         // Jump right - above or equal middle row
         else if (
@@ -172,7 +201,7 @@ function jumpable(currState, player, position) {
             currState[i - 1][j + 1] === "w" &&
             currState[i - 2][j + 2] === "-"
         ) {
-            jumpable.push("right");
+            jumpable.push({ move: "right", newPos: [i - 2, j + 2] });
         }
         // Special case: immediately below middle row jump left
         if (
@@ -182,7 +211,7 @@ function jumpable(currState, player, position) {
             currState[i - 1][j - 1] === "w" &&
             currState[i - 2][j - 1] === "-"
         ) {
-            jumpable.push("left");
+            jumpable.push({ move: "left", newPos: [i - 2, j - 1] });
         }
         // Special case: immediately below middle row jump right
         if (
@@ -192,52 +221,59 @@ function jumpable(currState, player, position) {
             currState[i - 1][j] === "w" &&
             currState[i - 2][j + 1] === "-"
         ) {
-            jumpable.push("right");
+            jumpable.push({ move: "right", newPos: [i - 2, j + 1] });
         }
     }
 
     return jumpable;
 }
 
-
 function moveLeft(currState, player, position) {
     const newState = currState.map(row => [...row]);
     const [i, j] = position;
     const middle = Math.floor(currState.length / 2);
-
     newState[i][j] = "-";
+    let newPosition = position;
 
     if (player === "w" && i < middle) {
         newState[i + 1][j - 1] = player;
+        newPosition = [i + 1, j - 1];
     } else if (player === "w" && i >= middle) {
         newState[i + 1][j] = player;
+        newPosition = [i + 1, j];
     } else if (player === "b" && i > middle) {
         newState[i - 1][j - 1] = player;
+        newPosition = [i - 1, j - 1];
     } else if (player === "b" && i <= middle) {
         newState[i - 1][j] = player;
+        newPosition = [i - 1, j];
     }
 
-    return newState;
+    return { board: newState, newPos: newPosition };
 }
 
 function moveRight(currState, player, position) {
     const newState = currState.map(row => [...row]);
     const [i, j] = position;
     const middle = Math.floor(currState.length / 2);
-
     newState[i][j] = "-";
+    let newPosition = position;
 
     if (player === "w" && i < middle) {
         newState[i + 1][j] = player;
+        newPosition = [i + 1, j];
     } else if (player === "w" && i >= middle) {
         newState[i + 1][j + 1] = player;
+        newPosition = [i + 1, j + 1];
     } else if (player === "b" && i > middle) {
         newState[i - 1][j] = player;
+        newPosition = [i - 1, j];
     } else if (player === "b" && i <= middle) {
         newState[i - 1][j + 1] = player;
+        newPosition = [i - 1, j + 1];
     }
 
-    return newState;
+    return { board: newState, newPos: newPosition };
 }
 
 function jumpLeft(currState, player, position) {
@@ -245,28 +281,35 @@ function jumpLeft(currState, player, position) {
     const [i, j] = position;
     const middle = Math.floor(currState.length / 2); //2
     newState[i][j] = "-";
+    let newPosition = position;
 
     if (player === "w" && i < middle - 1) {
         newState[i + 1][j - 1] = "-";
         newState[i + 2][j - 2] = player;
+        newPosition = [i + 2, j - 2];
     } else if (player === "w" && i === middle - 1) {
         newState[i + 1][j - 1] = "-";
         newState[i + 2][j - 1] = player;
+        newPosition = [i + 2, j - 1];
     } else if (player === "w" && i >= middle) {
         newState[i + 1][j] = "-";
-        newState[i + 2][j - 1] = player;
+        newState[i + 2][j] = player;
+        newPosition = [i + 2, j];
     } else if (player === "b" && i > middle + 1) {
         newState[i - 1][j - 1] = "-";
         newState[i - 2][j - 2] = player;
+        newPosition = [i - 2, j - 2];
     } else if (player === "b" && i === middle + 1) {
-        newState[i - 1][j] = "-";
+        newState[i - 1][j - 1] = "-";
         newState[i - 2][j - 1] = player;
+        newPosition = [i - 2, j - 1];
     } else if (player === "b" && i <= middle) {
         newState[i - 1][j] = "-";
         newState[i - 2][j] = player;
+        newPosition = [i - 2, j];
     }
 
-    return newState;
+    return { board: newState, newPos: newPosition };
 }
 
 function jumpRight(currState, player, position) {
@@ -274,68 +317,36 @@ function jumpRight(currState, player, position) {
     const [i, j] = position;
     const middle = Math.floor(currState.length / 2);
     newState[i][j] = "-";
+    let newPosition = position;
 
     if (player === "w" && i < middle - 1) {
         newState[i + 1][j] = "-";
-        newState[i + 2][j + 1] = player;
+        newState[i + 2][j] = player;
+        newPosition = [i + 2, j];
     } else if (player === "w" && i === middle - 1) {
         newState[i + 1][j] = "-";
         newState[i + 2][j + 1] = player;
+        newPosition = [i + 2, j + 1];
     } else if (player === "w" && i >= middle) {
         newState[i + 1][j + 1] = "-";
         newState[i + 2][j + 2] = player;
+        newPosition = [i + 2, j + 2];
     } else if (player === "b" && i > middle + 1) {
         newState[i - 1][j] = "-";
-        newState[i - 2][j - 1] = player;
+        newState[i - 2][j] = player;
+        newPosition = [i - 2, j];
     } else if (player === "b" && i === middle + 1) {
         newState[i - 1][j] = "-";
         newState[i - 2][j + 1] = player;
+        newPosition = [i - 2, j + 1];
     } else if (player === "b" && i <= middle) {
         newState[i - 1][j + 1] = "-";
         newState[i - 2][j + 2] = player;
+        newPosition = [i - 2, j + 2];
     }
 
-    return newState;
+    return { board: newState, newPos: newPosition };
 }
-
-// function printBoard(currState) {
-//     const rowCount = currState.length;
-//     const middle = Math.floor(rowCount / 2);
-
-//     console.log("    " + "-".repeat(4 * currState[0].length - 1));
-
-//     for (let i = 0; i < middle; i++) {
-//         let rowStr = "| ";
-//         for (let j = 0; j < currState[i].length; j++) {
-//             rowStr += currState[i][j] + " | ";
-//         }
-//         const numDashes = 4 * currState[i].length - 1;
-//         const numSpaces = Math.floor((4 * currState[i].length) / currState[i].length);
-//         console.log(" ".repeat(numSpaces) + rowStr + " ".repeat(numSpaces));
-//         console.log("    " + "-".repeat(numDashes));
-//     }
-
-//     for (let i = middle; i < rowCount - 1; i++) {
-//         let rowStr = "| ";
-//         for (let j = 0; j < currState[i].length; j++) {
-//             rowStr += currState[i][j] + " | ";
-//         }
-//         const numDashes = 4 * currState[i].length + 3;
-//         const numSpaces = Math.floor(numDashes / currState[i].length);
-//         console.log(" ".repeat(numSpaces) + rowStr + " ".repeat(numSpaces));
-//         console.log("    " + "-".repeat(numDashes));
-//     }
-
-//     // Last row
-//     let lastRowStr = "| ";
-//     for (let j = 0; j < currState[rowCount - 1].length; j++) {
-//         lastRowStr += currState[rowCount - 1][j] + " | ";
-//     }
-//     const finalDashes = 4 * currState[rowCount - 1].length - 1;
-//     const finalSpaces = Math.floor(finalDashes / currState[rowCount - 1].length);
-//     console.log(" ".repeat(finalSpaces) + lastRowStr + " ".repeat(finalSpaces));
-//     console.log("    " + "-".repeat(finalDashes));
-// }
 
 // Simplified way to print the board in JS
 function printBoard(board) {
@@ -458,27 +469,22 @@ function positionalScore(currState, player) {
 }
 
 function findOpponent(player) {
-    if (player === "w") return "b";
-    if (player === "b") return "w";
-    return "";
-}
-
-////////////////// Minimax-based Oska AI implementation ////////////////
-
-function findOpponent(player) {
     return player === "w" ? "b" : "w";
 }
+
+
+////////////////// Minimax-based Oska AI implementation ////////////////
 
 function oskaplayer(currState, player, depth) {
     let bestMove = currState;
     let maxVal = -Infinity;
     const neighbors = movegen(currState, player);
 
-    for (const neighbor of neighbors) {
-        const value = MinValue(neighbor, player, depth - 1);
+    for (const { board } of neighbors) {
+        const value = MinValue(board, player, depth - 1);
         if (value > maxVal) {
             maxVal = value;
-            bestMove = neighbor;
+            bestMove = board;
         }
     }
     return bestMove;
@@ -490,7 +496,7 @@ function MaxValue(currState, player, depth) {
     const oppMoves = movegen(currState, opponent);
 
     if (depth === 0 || (myMoves.length === 0 && oppMoves.length === 0)) {
-        return findValue(currState);
+        return findValue(currState, player);
     }
 
     if (myMoves.length === 0 && oppMoves.length > 0) {
@@ -498,8 +504,8 @@ function MaxValue(currState, player, depth) {
     }
 
     let value = -Infinity;
-    for (const move of myMoves) {
-        value = Math.max(value, MinValue(move, player, depth - 1));
+    for (const { board } of myMoves) {
+        value = Math.max(value, MinValue(board, player, depth - 1));
     }
     return value;
 }
@@ -510,7 +516,7 @@ function MinValue(currState, player, depth) {
     const oppMoves = movegen(currState, opponent);
 
     if (depth === 0 || (myMoves.length === 0 && oppMoves.length === 0)) {
-        return findValue(currState);
+        return findValue(currState, player);
     }
 
     if (myMoves.length === 0 && oppMoves.length > 0) {
@@ -518,16 +524,10 @@ function MinValue(currState, player, depth) {
     }
 
     let value = Infinity;
-    for (const move of myMoves) {
-        value = Math.min(value, MaxValue(move, player, depth - 1));
+    for (const { board } of myMoves) {
+        value = Math.min(value, MaxValue(board, player, depth - 1));
     }
     return value;
-}
-
-function findValue(currState) {
-    const whiteCount = count(currState, "w");
-    const blackCount = count(currState, "b");
-    return whiteCount - blackCount; // Positive if white is winning, negative if black is winning
 }
 
 

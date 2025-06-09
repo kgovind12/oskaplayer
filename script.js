@@ -1,77 +1,195 @@
 let selectedPiece = null;
 let legalMoves = [];
-let depth = 3;
+let searchDepth = 3;
+let userPlayer = "b";
+let computerPlayer = "w";
+let gameOver = false;
 
 attachBlackPieceListeners();
 
-// Function to make all the black pieces clickable
 function attachBlackPieceListeners() {
-  document.querySelectorAll('.col[piece="b"]').forEach(col => {
-    col.addEventListener('click', () => {
-      console.log("Piece clicked ", col);
-      clearHighlights();
+    if (gameOver) return;
+    document.querySelectorAll(`.col[piece=${userPlayer}]`).forEach(col => {
+        col.addEventListener('click', () => {
+            console.log("black piece clicked");
+            clearHighlights();
+            selectedPiece = col;
+            col.classList.add('selected');
 
-      selectedPiece = col;
-      col.classList.add('selected');
+            const currentPosition = getPosition(col.id);
+            console.log("selected position = ", currentPosition);
 
-      const [i, j] = getPosition(col.id);
-      const boardState = getBoardState();
+            const currentBoardState = getBoardState();
+            let newBoardState = currentBoardState; // This will change after moving
+            // legalMoves = generateLegalMoves(boardState, userPlayer, currentPosition);
 
-      legalMoves = movegen(boardState, 'b');
+            // Returns objects representing which direction it can move/jump, and the new position it can move/jump to
+            // Ex: { move: "left", newPos: [3.0] }
+            var possibleMoves = moveable(currentBoardState, userPlayer, currentPosition);
+            var possibleJumps = jumpable(currentBoardState, userPlayer, currentPosition);
 
-      legalMoves.forEach(move => {
-        const movedFrom = findMovedFrom(boardState, move, 'b');
-        const movedTo = findMovedTo(boardState, move, 'b');
-        if (movedFrom[0] === i && movedFrom[1] === j) {
-          const toId = `pos-${movedTo[0]}${movedTo[1]}`;
-          const toCell = document.getElementById(toId);
-          if (toCell) {
-            toCell.classList.add('highlight');
+            if ((possibleMoves.length === 0 || possibleJumps.length === 0)
+                && count(board, userPlayer) > 0) {
+                // No more moves left; game over
+                gameOver = true;
+                showWinner("AI wins!", "You have no more moves left.");
+                return;
+            }
 
-            toCell.addEventListener('click', () => {
-              if (!selectedPiece) return;
+            possibleMoves.forEach(possibleMove => {
+                console.log("Can move to: ", possibleMove.newPos);
+                const toCell = document.querySelector(`#pos-${possibleMove.newPos[0]}${possibleMove.newPos[1]}`);
+                toCell.classList.add("highlight");
 
-              const fromPos = getPosition(selectedPiece.id);
-              const toPos = [movedTo[0], movedTo[1]];
-              const updatedBoard = getBoardState();
+                if (possibleMove.move === "left") {
+                    // left move is possible
+                    toCell.addEventListener('click', () => {
+                        console.log("Moved left to: ", possibleMove.newPos);
+                        newBoardState = moveLeft(currentBoardState, userPlayer, currentPosition).board;
+                        updateBoardAndAIMove(newBoardState);
+                    });
+                } else if (possibleMove.move === "right") {
+                    // right move is possible
+                    toCell.addEventListener('click', () => {
+                        console.log("Moved right to: ", possibleMove.newPos);
+                        newBoardState = moveRight(currentBoardState, userPlayer, currentPosition).board;
+                        updateBoardAndAIMove(newBoardState);
+                    });
+                }
+            });
 
-              updatedBoard[toPos[0]][toPos[1]] = updatedBoard[fromPos[0]][fromPos[1]];
-              updatedBoard[fromPos[0]][fromPos[1]] = '-';
+            possibleJumps.forEach(possibleJump => {
+                console.log("Can move to: ", possibleJump.newPos);
+                const toCell = document.querySelector(`#pos-${possibleJump.newPos[0]}${possibleJump.newPos[1]}`);
+                toCell.classList.add("highlight");
 
-              updateBoardDOM(updatedBoard);
-              clearHighlights();
-
-              console.log("Player moved:");
-              printBoard(updatedBoard);
-
-              const aiMove = oskaplayer(updatedBoard, 'w', depth);
-              console.log("AI move:");
-              printBoard(aiMove);
-
-              updateBoardDOM(aiMove);
-
-              // ✅ Reattach black piece listeners after AI move
-              attachBlackPieceListeners();
-            }, { once: true });
-          }
-        }
-      });
-
+                if (possibleJump.move === "left") {
+                    // left jump is possible
+                    toCell.addEventListener('click', () => {
+                        console.log("Jumped left to: ", possibleJump.newPos);
+                        newBoardState = jumpLeft(currentBoardState, userPlayer, currentPosition).board;
+                        updateBoardAndAIMove(newBoardState);
+                    });
+                } else if (possibleJump.move === "right") {
+                    // right jump is possible
+                    toCell.addEventListener('click', () => {
+                        console.log("Jumped right to: ", possibleJump.newPos);
+                        newBoardState = jumpRight(currentBoardState, userPlayer, currentPosition).board;
+                        updateBoardAndAIMove(newBoardState);
+                    });
+                }
+            });
+        });
     });
+}
+
+function updateBoardAndAIMove(boardState) {
+    updateBoardDOM(boardState);
+    printBoard(boardState);
+
+    setTimeout(() => {
+        if (checkWin(boardState)) return;
+
+        const aiMove = oskaplayer(boardState, computerPlayer, searchDepth);
+        console.log("AI Move: ");
+        printBoard(aiMove);
+        updateBoardDOM(aiMove);
+
+        setTimeout(() => {
+            checkWin(aiMove);
+        }, 500); // Delay to allow AI move DOM update to render
+    }, 500); // Delay to allow user move DOM update to render
+}
+
+
+function removeAllEventListenersFromSquares() {
+  const cells = document.querySelectorAll('.col');
+
+  cells.forEach(cell => {
+    const newCell = cell.cloneNode(true); // clone the cell, including its attributes and children
+    cell.parentNode.replaceChild(newCell, cell); // replace old cell with clone
   });
+}
+
+function checkWin(board) {
+    let userPiecesInGoal = 0;
+    let computerPiecesInGoal = 0;
+    let totalUserPieces = count(board, userPlayer);
+    let totalComputerPieces = count(board, computerPlayer);
+    const topRow = 0;
+    const bottomRow = board.length - 1;
+
+    if (totalUserPieces === 0) {
+        showWinner("AI wins!", "All your pieces have been captured.");
+        gameOver = true;
+        return true;
+    }
+
+    if (totalComputerPieces === 0) {
+        showWinner("You win!", "You have captured all of my Oska bot's pieces.");
+        gameOver = true;
+        return true;
+    }
+
+    // Check if all user's pieces are at the goal
+    for (let i = 0; i < board[topRow].length; i++) {
+        if (board[0][i] === userPlayer) {
+            userPiecesInGoal++;
+            if (userPiecesInGoal === totalUserPieces) {
+                showWinner("You win!", "You are smarter than my Oska playing bot.");
+                gameOver = true;
+                return true;
+            }
+        }
+    }
+
+    for (let i = 0; i < board[bottomRow].length; i++) {
+        if (board[bottomRow][i] === computerPlayer) {
+            computerPiecesInGoal++;
+            if (computerPiecesInGoal === totalComputerPieces) {
+                showWinner("AI wins!", "My Oska bot outsmarted you this time.");
+                gameOver = true;
+                return true;
+            }
+        }
+    }
+
+    // ❗ Check if computer has no available moves
+    const computerMoves = generateNewStates(board, computerPlayer);
+    if (computerMoves.length === 0 && totalComputerPieces > 0) {
+        showWinner("You win!", "My Oska bot is out of moves. Victory is yours!");
+        gameOver = true;
+        return true;
+    }
+
+    return false;
+}
+
+function showWinner(title, message) {
+    alert(`${title}\n\n${message}`);
 }
 
 
 // Helper function to update all the divs based on board array
 function updateBoardDOM(board) {
-  board.forEach((row, i) => {
-    row.forEach((piece, j) => {
-      const cell = document.getElementById(`pos-${i}${j}`);
-      if (cell) {
-        cell.setAttribute('piece', piece);
-      }
+    board.forEach((row, i) => {
+        row.forEach((piece, j) => {
+            const cell = document.getElementById(`pos-${i}${j}`);
+            if (cell) {
+                cell.setAttribute('piece', piece);
+            }
+        });
     });
-  });
+    clearHighlights();
+    removeAllEventListenersFromSquares();
+    attachBlackPieceListeners();
+}
+
+function updatePlayerMove(fromPos, toPos, piece) {
+    const fromCell = document.getElementById(`pos-${fromPos[0]}${fromPos[1]}`);
+    const toCell = document.getElementById(`pos-${toPos[0]}${toPos[1]}`);
+    fromCell.setAttribute('piece', '-'); // clear the current square
+    toCell.setAttribute('piece', piece); // move the player to the new square
 }
 
 function clearHighlights() {
@@ -97,6 +215,7 @@ function getBoardState() {
     });
     board.push(rowArr);
   });
+  console.log("Board state right now = ", board);
   return board;
 }
 
