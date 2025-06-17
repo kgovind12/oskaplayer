@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <title>Oska Game</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Michroma">
   <script defer src="script.js"></script>
   <script defer src="oskaplayer.js"></script>
 </head>
 <body>
-    <h1>Oska Game</h1>
+    <h1 id="turn-indicator">Your move.</h1>
     <div id="oska-container">
         <div class="board" id="board">
             <div class="row" id="row0">
@@ -41,5 +42,14 @@
         <button id="restart-btn">Restart</button>
     </div>
     <div id="ghost-piece"></div>
+
+    <!-- Win/Loss Modal -->
+    <div id="modal-overlay" class="hidden">
+        <div id="game-modal">
+            <h2 id="modal-title"></h2>
+            <p id="modal-message"></p>
+            <button id="modal-close-btn">OK</button>
+        </div>
+    </div>
 </body>
 </html>

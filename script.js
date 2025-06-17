@@ -116,6 +116,7 @@ function updateBoardAndAIMove(boardState) {
     printBoard(boardState);
 
     document.getElementById('ghost-piece').style.display = 'none'; // hide ghost
+    document.getElementById("turn-indicator").textContent = "Oska bot's move.";
 
     setTimeout(() => {
         if (checkWin(boardState)) return;
@@ -126,7 +127,9 @@ function updateBoardAndAIMove(boardState) {
         updateBoardDOM(aiMove);
 
         setTimeout(() => {
-            checkWin(aiMove);
+            if (!checkWin(aiMove)) {
+                document.getElementById("turn-indicator").textContent = "Your move.";
+            }
         }, 500); // Delay to allow AI move DOM update to render
     }, 500); // Delay to allow user move DOM update to render
 }
@@ -166,7 +169,7 @@ function checkWin(board) {
         if (board[0][i] === userPlayer) {
             userPiecesInGoal++;
             if (userPiecesInGoal === totalUserPieces) {
-                showWinner("You win!", "You are smarter than my Oska playing bot.");
+                showWinner("You win!", "Congratulations, you are smarter than my Oska bot.");
                 gameOver = true;
                 return true;
             }
@@ -177,7 +180,7 @@ function checkWin(board) {
         if (board[bottomRow][i] === computerPlayer) {
             computerPiecesInGoal++;
             if (computerPiecesInGoal === totalComputerPieces) {
-                showWinner("AI wins!", "My Oska bot outsmarted you this time.");
+                showWinner("AI wins!", "Looks like my Oska bot outsmarted you this time.");
                 gameOver = true;
                 return true;
             }
@@ -196,7 +199,17 @@ function checkWin(board) {
 }
 
 function showWinner(title, message) {
-    alert(`${title}\n\n${message}`);
+    const modalOverlay = document.getElementById("modal-overlay");
+    const modalTitle = document.getElementById("modal-title");
+    const modalMessage = document.getElementById("modal-message");
+
+    modalTitle.textContent = title;
+    modalMessage.textContent = message;
+    modalOverlay.classList.remove("hidden");
+
+    document.getElementById("modal-close-btn").onclick = () => {
+        modalOverlay.classList.add("hidden");
+    };
 }
 
 
