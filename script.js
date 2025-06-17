@@ -16,6 +16,11 @@ function attachBlackPieceListeners() {
             selectedPiece = col;
             col.classList.add('selected');
 
+            // Show ghost piece
+            const ghost = document.getElementById('ghost-piece');
+            ghost.className = 'black';
+            ghost.style.display = 'block';
+
             const currentPosition = getPosition(col.id);
             console.log("selected position = ", currentPosition);
 
@@ -35,6 +40,29 @@ function attachBlackPieceListeners() {
                 showWinner("AI wins!", "You have no more moves left.");
                 return;
             }
+
+            document.addEventListener('mousemove', (e) => {
+                const ghost = document.getElementById('ghost-piece');
+                if (ghost.style.display === 'block') {
+                    ghost.style.left = `${e.clientX}px`;
+                    ghost.style.top = `${e.clientY}px`;
+
+                    // Detect underlying element
+                    const elemUnderCursor = document.elementFromPoint(e.clientX, e.clientY);
+
+                    // If it's a highlighted cell, add the valid-hover class
+                    if (elemUnderCursor && elemUnderCursor.classList.contains('highlight')) {
+                        ghost.classList.add('valid-hover');
+                    } else {
+                        ghost.classList.remove('valid-hover');
+                    }
+                }
+            });
+
+            // document.addEventListener('click', (e) => {
+            //     const ghost = document.getElementById('ghost-piece');
+            //     ghost.style.display = 'none';
+            // });
 
             possibleMoves.forEach(possibleMove => {
                 console.log("Can move to: ", possibleMove.newPos);
@@ -86,6 +114,8 @@ function attachBlackPieceListeners() {
 function updateBoardAndAIMove(boardState) {
     updateBoardDOM(boardState);
     printBoard(boardState);
+
+    document.getElementById('ghost-piece').style.display = 'none'; // hide ghost
 
     setTimeout(() => {
         if (checkWin(boardState)) return;
@@ -238,6 +268,12 @@ function findMovedTo(before, after, player) {
     }
   }
 }
+
+// Restart the game
+document.getElementById("restart-btn").addEventListener("click", () => {
+    location.reload();
+});
+
 
 // Bugs
 // - None of the 3rd row items are getting selected

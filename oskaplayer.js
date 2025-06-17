@@ -393,6 +393,10 @@ function findValue(currState, yourPlayer) {
     const totalCountPlayer = count(currState, yourPlayer);
     const totalCountOpponent = count(currState, opponent);
 
+    // Count pieces in the goal rows
+    let countInWinningIndex = 0;
+    let countInOpponentIndex = 0;
+
     // Determine goal rows for each player
     if (yourPlayer === "w") {
         winningIndex = currState.length - 1;
@@ -401,10 +405,6 @@ function findValue(currState, yourPlayer) {
         winningIndex = 0;
         opponentIndex = currState.length - 1;
     }
-
-    // Count pieces in the goal rows
-    let countInWinningIndex = 0;
-    let countInOpponentIndex = 0;
 
     for (const piece of currState[winningIndex]) {
         if (piece === yourPlayer) countInWinningIndex++;
@@ -420,22 +420,23 @@ function findValue(currState, yourPlayer) {
     if (countInWinningIndex !== 0 &&
         countInWinningIndex === totalCountPlayer &&
         countInOpponentIndex !== totalCountOpponent) {
-        value = 10;
+        value = 10; // player's pieces have reached goal state and opponent's have not
     } else if (count(currState, opponent) === 0) {
-        value = 10;
+        value = 10; // opponent has lost all pieces
     } else if (countInOpponentIndex !== 0 &&
                countInOpponentIndex === totalCountOpponent &&
                countInWinningIndex !== totalCountPlayer) {
-        value = -10;
+        value = -10; // opponent's pieces have reached goal state and player's have not
     } else if (count(currState, yourPlayer) === 0) {
-        value = -10;
+        value = -10; // player has lost all pieces
     } else if (countInWinningIndex === totalCountPlayer && countInOpponentIndex === totalCountOpponent) {
+        // Both have reached their goals
         if (countInWinningIndex > countInOpponentIndex) {
-            value = 10;
+            value = 10; // more player's pieces have reached goal than opponent's pieces
         } else if (countInOpponentIndex > countInWinningIndex) {
-            value = -10;
+            value = -10; // more opponent's pieces have reached goal than player's pieces
         } else {
-            value = 0;
+            value = 0; // draw
         }
     } else {
         // No clear win/loss — apply heuristic

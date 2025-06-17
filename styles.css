@@ -39,6 +39,10 @@ h1 {
     position: relative;
 }
 
+.col[piece="w"],.col[piece="b"] {
+    transition: transform 0.3s ease;
+}
+
 /* White piece */
 .col[piece="w"]::before {
     content: "";
@@ -76,4 +80,44 @@ h1 {
 
 .col.highlight:hover {
     cursor: pointer;
+}
+
+#oska-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+#restart-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Ghost piece styling */
+#ghost-piece {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%) scale(1);
+  transition: transform 0.15s ease-in-out;
+  display: none;
+}
+
+#ghost-piece.black {
+  background-color: black;
+}
+
+#ghost-piece.white {
+  background-color: white;
+}
+
+#ghost-piece.valid-hover {
+  transform: translate(-50%, -50%) scale(1.3); /* Scaled up */
 }
