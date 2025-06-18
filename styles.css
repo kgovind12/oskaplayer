@@ -1,247 +1,54 @@
 body {
-    font-family: 'Segoe UI', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: #f2f2f2;
-    margin: 0;
-    height: 100vh;
-    background: linear-gradient(#2d3436, #000000);
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  background: linear-gradient(to bottom, #1e272e, #000000);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Nunito Sans', sans-serif; 
+  color: #f1f2f6;
+}
+
+.container {
+  text-align: center;
 }
 
 h1 {
-    margin-bottom: 20px;
-    font-size: 2em;
-    color: #dcdde1;
-    text-shadow: 1px 1px 2px black;
-    font-family: 'Michroma', serif;
+  font-family: 'Michroma', sans-serif;
+  font-size: 2em;
+  margin-bottom: 40px;
+  color: #f5f6fa;
+  text-shadow: 1px 1px 4px #000;
 }
 
-.board {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    background: #2f3640;
-    padding: 38px;
-    border-radius: 12px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
-    transform: rotateX(8deg);
-}
-
-.board:hover {
-  transform: rotateX(4deg);
-}
-
-.row {
-    display: flex;
-    justify-content: center; /* center-align rows */
-    gap: 8px;
-}
-
-.col {
-    width: 70px;
-    height: 70px;
-    background-color: beige;
-    border: 1px solid #999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    position: relative;
-    background: linear-gradient(165deg, #f8f8c0, #594e4e);
-    border-radius: 10px;
-    box-shadow:
-        inset 2px 2px 2px rgba(255, 255, 255, 0.05),
-        inset -2px -2px 4px rgba(0, 0, 0, 0.3),
-        0 4px 7px rgba(0, 0, 0, 0.4)
-}
-
-.col[piece="w"],.col[piece="b"] {
-    transition: transform 0.3s ease;
-}
-
-/* Shared piece styles */
-.col[piece="w"]::before,
-.col[piece="b"]::before {
-    content: "";
-    position: absolute;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    box-shadow:
-        inset -2px -2px 6px rgba(255, 255, 255, 0.2),
-        inset 2px 2px 6px rgba(0, 0, 0, 0.6),
-        0 2px 5px rgba(0, 0, 0, 0.8);
-    border: 2px solid #333;
-    z-index: 1;
-}
-
-/* Black checker-style piece */
-.col[piece="b"]::before {
-    background: radial-gradient(circle at 30% 30%, #444, #111);
-}
-
-/* White checker-style piece */
-.col[piece="w"]::before {
-    background: radial-gradient(circle at 30% 30%, #eee, #aaa);
-}
-
-
-.col[piece="b"]:hover {
-    outline: 2px solid rgb(255, 221, 0);
-    cursor: pointer;
-}
-
-.col.selected {
-    outline: 3px solid rgb(255, 221, 0);
-}
-
-.col.highlight {
-    border: 2px dashed rgb(255, 221, 0);
-    animation: pulse 1.5s infinite ease-in-out;
-    transform: scale(1.1);
-}
-
-.col.highlight:hover {
-    cursor: pointer;
-}
-
-#oska-container {
+.btn-group {
   display: flex;
   flex-direction: column;
+  gap: 16px;
   align-items: center;
-  margin-top: 20px;
 }
 
-#restart-btn {
-  margin-top: 20px;
-  padding: 12px 24px;
-  background: linear-gradient(145deg, #1f1f1f, #2a2a2a);
-  color: #f0f0f0;
-  border: 1px solid #444;
-  border-radius: 8px;
+.btn {
+  padding: 14px 28px;
   font-size: 1rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.6);
-  transition: all 0.2s ease-in-out;
-}
-
-#restart-btn:hover {
-  background: linear-gradient(145deg, #2a2a2a, #3a3a3a);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.7);
-}
-
-#restart-btn:active {
-  transform: translateY(0);
-  background: linear-gradient(145deg, #181818, #222);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
-}
-
-/************************** Ghost piece styling ********************/
-/* Ghost piece styling */
-#ghost-piece {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 10000;
-  transform: translate(-50%, -50%) scale(1);
-  transition: transform 0.15s ease-in-out;
-  display: none;
-  opacity: 0.6;
-  box-shadow:
-    inset -2px -2px 6px rgba(255, 255, 255, 0.2),
-    inset 2px 2px 6px rgba(0, 0, 0, 0.5),
-    0 2px 5px rgba(0, 0, 0, 0.7);
-  border: 2px solid #333;
-}
-
-/* Ghost black piece */
-#ghost-piece.black {
-  background: radial-gradient(circle at 30% 30%, #444, #111);
-}
-
-/* Ghost white piece */
-#ghost-piece.white {
-  background: radial-gradient(circle at 30% 30%, #eee, #aaa);
-}
-
-/* Hovering over a valid cell — scale up */
-#ghost-piece.valid-hover {
-  transform: translate(-50%, -50%) scale(1.3);
-  opacity: 0.8;
-}
-
-
-/****************************** Animations *****************************/
-@keyframes pulse {
-  0% { box-shadow: 0 0 0px 0px rgba(255, 221, 0, 0.5); }
-  50% { box-shadow: 0 0 2px 2px rgba(255, 221, 0, 0.3); }
-  100% { box-shadow: 0 0 0px 0px rgba(255, 221, 0, 0.5); }
-}
-
-/****************************** Modal styles *****************************/
-
-/* Modal Overlay */
-#modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-/* Hidden by default */
-.hidden {
-  display: none !important;
-}
-
-/* Modal Box */
-#game-modal {
-  background: #fff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  text-align: center;
-  max-width: 400px;
-  width: 80%;
-}
-
-#game-modal h2 {
-  margin-top: 0;
-  font-size: 24px;
-  color: #333;
-}
-
-#game-modal p {
-  margin: 20px 0;
-  font-size: 16px;
-  color: #555;
-}
-
-#modal-close-btn {
-  padding: 10px 20px;
-  font-size: 14px;
-  background-color: #2ecc71;
-  color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #2f3542, #1e272e);
+  color: #f1f2f6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+  width: 200px;
+  font-family: 'Nunito Sans', sans-serif; 
 }
 
-#modal-close-btn:hover {
-  background-color: #27ae60;
+.btn:hover {
+  background: linear-gradient(145deg, #404b5c, #2c3a4b);
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
 }

@@ -1,54 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Oska Game</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Oska | Home</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Nunito+Sans&display=swap">
+  <link rel="stylesheet" href="modal.css">
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Michroma">
   <script defer src="script.js"></script>
-  <script defer src="oskaplayer.js"></script>
 </head>
 <body>
-    <h1 id="turn-indicator">Your move.</h1>
-    <div id="oska-container">
-        <div class="board" id="board">
-            <div class="row" id="row0">
-                <div class="col" id="pos-00" piece="w"></div>
-                <div class="col" id="pos-01" piece="w"></div>
-                <div class="col" id="pos-02" piece="w"></div>
-                <div class="col" id="pos-03" piece="w"></div>
-            </div>
-            <div class="row" id="row1">
-                <div class="col" id="pos-10" piece="-"></div>
-                <div class="col" id="pos-11" piece="-"></div>
-                <div class="col" id="pos-12" piece="-"></div>
-            </div>
-            <div class="row" id="row2">
-                <div class="col" id="pos-20" piece="-"></div>
-                <div class="col" id="pos-21" piece="-"></div>
-            </div>
-            <div class="row" id="row3">
-                <div class="col" id="pos-30" piece="-"></div>
-                <div class="col" id="pos-31" piece="-"></div>
-                <div class="col" id="pos-32" piece="-"></div>
-            </div>
-            <div class="row" id="row4">
-                <div class="col" id="pos-40" piece="b"></div>
-                <div class="col" id="pos-41" piece="b"></div>
-                <div class="col" id="pos-42" piece="b"></div>
-                <div class="col" id="pos-43" piece="b"></div>
-            </div>
+    <div class="container">
+        <h1>Hello human, let's play Oska.</h1>
+        <div class="btn-group">
+            <button class="btn" id="how-to-play-btn">How to play</button>
+            <button class="btn" onclick="location.href='oskaplayer.html'">Start game</button>
         </div>
-        <button id="restart-btn">Restart</button>
     </div>
-    <div id="ghost-piece"></div>
-
-    <!-- Win/Loss Modal -->
-    <div id="modal-overlay" class="hidden">
-        <div id="game-modal">
-            <h2 id="modal-title"></h2>
-            <p id="modal-message"></p>
-            <button id="modal-close-btn">OK</button>
+    <!-- How to Play Modal -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div id="modal" class="modal">
+            <span id="modal-close-btn" class="modal-close-btn">&times;</span>
+            <h2>How to Play Oska</h2>
+            <ol>
+                <li>Step 1: [Instruction goes here]</li>
+                <li>Step 2: [Instruction goes here]</li>
+                <li>Step 3: [Instruction goes here]</li>
+            </ol>
         </div>
     </div>
 </body>
