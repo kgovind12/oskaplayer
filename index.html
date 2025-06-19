@@ -11,22 +11,34 @@
 </head>
 <body>
     <div class="container">
-        <h1>Hello human, let's play Oska.</h1>
+        <h1 class="animated-title">Hello human, let's play Oska.</h1>
         <div class="btn-group">
             <button class="btn" id="how-to-play-btn">How to play</button>
-            <button class="btn" onclick="location.href='oskaplayer.html'">Start game</button>
+            <button class="btn" id="start-game" onclick="location.href='oskaplayer.html'">Start game</button>
         </div>
     </div>
     <!-- How to Play Modal -->
     <div id="modal-overlay" class="modal-overlay hidden">
         <div id="modal" class="modal">
             <span id="modal-close-btn" class="modal-close-btn">&times;</span>
-            <h2>How to Play Oska</h2>
-            <ol>
-                <li>Step 1: [Instruction goes here]</li>
-                <li>Step 2: [Instruction goes here]</li>
-                <li>Step 3: [Instruction goes here]</li>
-            </ol>
+            <h2>What is Oska?</h2>
+            <p>
+                Oska is a two-player abstract strategy board game, inspired by checkers, 
+                where the objective is to move your pieces to the opposite side of the board before your opponent does.
+                Players move their pieces diagonally, and can capture opponent pieces by jumping over them. 
+                The unique twist is that the player who gets all their remaining (active) pieces to the opposite end of the board wins, 
+                which means losing pieces can be advantageous. 
+            </p>
+            <h3>How to play:</h3>
+            <ul>
+                <li>You can move one step diagonally forward into an empty space.</li>
+                <li>
+                    You can capture your opponent's piece by jumping diagonally over it.
+                    Multiple jumps in a single turn are not allowed.
+                </li>
+                <li>The first player to move all their pieces to the opposite end of the board wins.</li>
+                <li>Remember: Sometimes, losing your pieces can help you win!</li>
+            </ul>
         </div>
     </div>
 </body>

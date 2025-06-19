@@ -11,7 +11,11 @@
 </head>
 <body>
     <button id="how-to-play-btn" class="btn top-right-btn">How to Play</button>
-    <h1 id="turn-indicator">Your move.</h1>
+    <div id="h1-wrapper">
+        <h1 id="turn-indicator">Your move.</h1>
+        <img id="bot-loader" src="images/hourglass.png" class="hidden" alt="Loading" />
+    </div>
+
     <div id="oska-container">
         <div class="board" id="board">
             <div class="row" id="row0">
@@ -48,6 +52,7 @@
     <!-- Win/Loss Modal -->
     <div id="game-over-modal-overlay" class="modal-overlay hidden">
         <div id="game-over-modal" class="modal">
+            <img id="game-over-modal-img" src="" alt="Winner Image" class="hidden" />
             <h2 id="game-over-modal-title" class="modal-title"></h2>
             <p id="game-over-modal-message" class="modal-message"></p>
             <button id="game-over-modal-ok-btn">OK</button>
@@ -58,12 +63,24 @@
     <div id="how-to-play-modal-overlay" class="modal-overlay hidden">
         <div id="how-to-play-modal" class="modal">
             <span id="how-to-play-modal-close-btn" class="modal-close-btn">&times;</span>
-            <h2>How to Play Oska</h2>
-            <ol>
-                <li>Step 1: [Instruction goes here]</li>
-                <li>Step 2: [Instruction goes here]</li>
-                <li>Step 3: [Instruction goes here]</li>
-            </ol>
+            <h2>What is Oska?</h2>
+            <p>
+                Oska is a two-player abstract strategy board game, inspired by checkers, 
+                where the objective is to move your pieces to the opposite side of the board before your opponent does.
+                Players move their pieces diagonally, and can capture opponent pieces by jumping over them. 
+                The unique twist is that the player who gets all their remaining (active) pieces to the opposite end of the board wins, 
+                which means losing pieces can be advantageous. 
+            </p>
+            <h3>How to play:</h3>
+            <ul>
+                <li>You can move one step diagonally forward into an empty space.</li>
+                <li>
+                    You can capture your opponent's piece by jumping diagonally over it.
+                    Multiple jumps in a single turn are not allowed.
+                </li>
+                <li>The first player to move all their pieces to the opposite end of the board wins.</li>
+                <li>Remember: Sometimes, losing your pieces can help you win!</li>
+            </ul>
         </div>
     </div>
 </body>

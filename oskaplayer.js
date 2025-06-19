@@ -5,6 +5,15 @@ let userPlayer = "b";
 let computerPlayer = "w";
 let gameOver = false;
 
+// Create audio object
+const moveSound = new Audio('sounds/move.mp3');
+
+// Function to play sound
+function playMoveSound() {
+  moveSound.currentTime = 0; // rewind to start
+  moveSound.play();
+}
+
 attachBlackPieceListeners();
 
 function attachBlackPieceListeners() {
@@ -113,10 +122,12 @@ function attachBlackPieceListeners() {
 
 function updateBoardAndAIMove(boardState) {
     updateBoardDOM(boardState);
+    playMoveSound();
     printBoard(boardState);
 
     document.getElementById('ghost-piece').style.display = 'none'; // hide ghost
     document.getElementById("turn-indicator").textContent = "Oska bot's move.";
+    document.getElementById('bot-loader').classList.remove('hidden'); // show loader when oska bot is thinking
 
     setTimeout(() => {
         if (checkWin(boardState)) return;
@@ -125,15 +136,16 @@ function updateBoardAndAIMove(boardState) {
         console.log("AI Move: ");
         printBoard(aiMove);
         updateBoardDOM(aiMove);
+        playMoveSound();
 
         setTimeout(() => {
             if (!checkWin(aiMove)) {
                 document.getElementById("turn-indicator").textContent = "Your move.";
+                document.getElementById('bot-loader').classList.add('hidden'); // hide loader when oska bot is done
             }
         }, 500); // Delay to allow AI move DOM update to render
     }, 500); // Delay to allow user move DOM update to render
 }
-
 
 function removeAllEventListenersFromSquares() {
   const cells = document.querySelectorAll('.col');
@@ -202,16 +214,27 @@ function showWinner(title, message) {
     const modalOverlay = document.getElementById("game-over-modal-overlay");
     const modalTitle = document.getElementById("game-over-modal-title");
     const modalMessage = document.getElementById("game-over-modal-message");
+    const winnerImage = document.getElementById("game-over-modal-img");
 
     modalTitle.textContent = title;
     modalMessage.textContent = message;
     modalOverlay.classList.remove("hidden");
+    document.getElementById('bot-loader').classList.add('hidden');
+
+    if (title === "AI wins!") {
+        winnerImage.src = 'images/robot.png';
+        winnerImage.classList.remove('hidden');
+    } else if (title === "You win!") {
+        winnerImage.src = 'images/human.png';
+        winnerImage.classList.remove('hidden');
+    } else {
+        console.log("Wrong title - no image displayed");
+    }
 
     document.getElementById("game-over-modal-ok-btn").onclick = () => {
         modalOverlay.classList.add("hidden");
     };
 }
-
 
 // Helper function to update all the divs based on board array
 function updateBoardDOM(board) {
@@ -287,10 +310,27 @@ document.getElementById("restart-btn").addEventListener("click", () => {
     location.reload();
 });
 
-document.getElementById("how-to-play-btn").addEventListener("click", () => {
-    document.getElementById("how-to-play-modal-overlay").classList.remove("hidden");
-});
+const modal = document.getElementById("how-to-play-modal");
+const overlay = document.getElementById("how-to-play-modal-overlay");
 
-document.getElementById("how-to-play-modal-close-btn").addEventListener("click", () => {
-    document.getElementById("how-to-play-modal-overlay").classList.add("hidden");
-});
+document.getElementById("how-to-play-btn").addEventListener("click", openModal);
+document.getElementById("how-to-play-modal-close-btn").addEventListener("click", closeModal);
+
+function openModal() {
+  overlay.classList.remove('hidden');
+
+  // Slight delay ensures DOM has time to apply the transition cleanly
+  setTimeout(() => {
+    modal.classList.add('show');
+  }, 10);
+}
+
+// Close modal with animation
+function closeModal() {
+  modal.classList.remove('show');
+
+  // Wait for the transition to finish before hiding the overlay
+  setTimeout(() => {
+    overlay.classList.add('hidden');
+  }, 150); // same as CSS transition duration
+}

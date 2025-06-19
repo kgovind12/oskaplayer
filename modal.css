@@ -23,6 +23,16 @@
   width: 90%;
   border: 1px solid #444;
   position: relative;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.modal.show {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
 }
 
 .modal h2 {
@@ -33,15 +43,14 @@
   text-shadow: 1px 1px 2px black;
 }
 
-.modal p {
+.modal h3, .modal p {
     color: #f0f0f0;
 }
 
-.modal ol {
+.modal ul {
   margin: 20px 0;
   padding-left: 20px;
   color: #ddd;
-  font-family: 'Segoe UI', sans-serif;
   font-size: 15px;
 }
 
