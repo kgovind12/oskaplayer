@@ -121,13 +121,13 @@ function attachBlackPieceListeners() {
 }
 
 function updateBoardAndAIMove(boardState) {
+    document.getElementById("turn-indicator").textContent = "Oska bot's move.";
+    document.getElementById('bot-loader').classList.remove('hidden'); // show loader when oska bot is thinking
     updateBoardDOM(boardState);
     playMoveSound();
     printBoard(boardState);
 
     document.getElementById('ghost-piece').style.display = 'none'; // hide ghost
-    document.getElementById("turn-indicator").textContent = "Oska bot's move.";
-    document.getElementById('bot-loader').classList.remove('hidden'); // show loader when oska bot is thinking
 
     setTimeout(() => {
         if (checkWin(boardState)) return;
@@ -212,13 +212,13 @@ function checkWin(board) {
 
 function showWinner(title, message) {
     const modalOverlay = document.getElementById("game-over-modal-overlay");
+    const modal = document.getElementById("game-over-modal");
     const modalTitle = document.getElementById("game-over-modal-title");
     const modalMessage = document.getElementById("game-over-modal-message");
     const winnerImage = document.getElementById("game-over-modal-img");
 
     modalTitle.textContent = title;
     modalMessage.textContent = message;
-    modalOverlay.classList.remove("hidden");
     document.getElementById('bot-loader').classList.add('hidden');
 
     if (title === "AI wins!") {
@@ -231,8 +231,10 @@ function showWinner(title, message) {
         console.log("Wrong title - no image displayed");
     }
 
+    openModal(modal, modalOverlay);
+
     document.getElementById("game-over-modal-ok-btn").onclick = () => {
-        modalOverlay.classList.add("hidden");
+        closeModal(modal, modalOverlay);
     };
 }
 
@@ -249,13 +251,6 @@ function updateBoardDOM(board) {
     clearHighlights();
     removeAllEventListenersFromSquares();
     attachBlackPieceListeners();
-}
-
-function updatePlayerMove(fromPos, toPos, piece) {
-    const fromCell = document.getElementById(`pos-${fromPos[0]}${fromPos[1]}`);
-    const toCell = document.getElementById(`pos-${toPos[0]}${toPos[1]}`);
-    fromCell.setAttribute('piece', '-'); // clear the current square
-    toCell.setAttribute('piece', piece); // move the player to the new square
 }
 
 function clearHighlights() {
@@ -285,38 +280,29 @@ function getBoardState() {
   return board;
 }
 
-function findMovedFrom(before, after, player) {
-  for (let i = 0; i < before.length; i++) {
-    for (let j = 0; j < before[i].length; j++) {
-      if (before[i][j] === player && after[i][j] === '-') {
-        return [i, j];
-      }
-    }
-  }
-}
-
-function findMovedTo(before, after, player) {
-  for (let i = 0; i < after.length; i++) {
-    for (let j = 0; j < after[i].length; j++) {
-      if (before[i][j] === '-' && after[i][j] === player) {
-        return [i, j];
-      }
-    }
-  }
-}
-
 // Restart the game
 document.getElementById("restart-btn").addEventListener("click", () => {
     location.reload();
 });
 
-const modal = document.getElementById("how-to-play-modal");
-const overlay = document.getElementById("how-to-play-modal-overlay");
+const howToPlayModal = document.getElementById("how-to-play-modal");
+const howToPlayModalOverlay = document.getElementById("how-to-play-modal-overlay");
 
-document.getElementById("how-to-play-btn").addEventListener("click", openModal);
-document.getElementById("how-to-play-modal-close-btn").addEventListener("click", closeModal);
+document.getElementById("how-to-play-btn").addEventListener("click", () => {
+    openModal(howToPlayModal, howToPlayModalOverlay);
+});
+document.getElementById("how-to-play-modal-close-btn").addEventListener("click", () => {
+    closeModal(howToPlayModal, howToPlayModalOverlay);
+});
 
-function openModal() {
+// Optionally close when clicking outside the modal
+howToPlayModalOverlay.addEventListener("click", (e) => {
+  if (e.target === howToPlayModalOverlay) {
+    closeModal(howToPlayModal, howToPlayModalOverlay);
+  }
+});
+
+function openModal(modal, overlay) {
   overlay.classList.remove('hidden');
 
   // Slight delay ensures DOM has time to apply the transition cleanly
@@ -326,7 +312,7 @@ function openModal() {
 }
 
 // Close modal with animation
-function closeModal() {
+function closeModal(modal, overlay) {
   modal.classList.remove('show');
 
   // Wait for the transition to finish before hiding the overlay

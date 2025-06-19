@@ -199,7 +199,7 @@ h1 {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  filter: brightness(1.1) contrast(1.2) hue-rotate(342deg);
+  filter: brightness(1.1) contrast(1.2) hue-rotate(318deg);
 }
 
 #game-over-modal-ok-btn {
