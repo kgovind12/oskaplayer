@@ -421,32 +421,49 @@ function findValue(currState, yourPlayer) {
         countInWinningIndex === totalCountPlayer &&
         countInOpponentIndex !== totalCountOpponent) {
         value = 10; // player's pieces have reached goal state and opponent's have not
-    } else if (count(currState, opponent) === 0) {
+        console.log("Value player has won ", value);
+    } else if (countInWinningIndex !== 0 &&
+        countInWinningIndex === totalCountPlayer &&
+        countInOpponentIndex === totalCountOpponent) {
+        value = -10; // Do not capture a player's piece to get home faster when it's their last piece
+        console.log("Value opp has won at the same time ", value);
+    } else if (totalCountOpponent === 0) {
         value = 10; // opponent has lost all pieces
+        console.log("Value opp has lost all pieces ", value);
     } else if (countInOpponentIndex !== 0 &&
                countInOpponentIndex === totalCountOpponent &&
                countInWinningIndex !== totalCountPlayer) {
         value = -10; // opponent's pieces have reached goal state and player's have not
-    } else if (count(currState, yourPlayer) === 0) {
+        console.log("Value opp has won ", value);
+    } else if (totalCountPlayer === 0) {
         value = -10; // player has lost all pieces
-    } else if (countInWinningIndex === totalCountPlayer && countInOpponentIndex === totalCountOpponent) {
-        // Both have reached their goals
-        if (countInWinningIndex > countInOpponentIndex) {
-            value = 10; // more player's pieces have reached goal than opponent's pieces
-        } else if (countInOpponentIndex > countInWinningIndex) {
-            value = -10; // more opponent's pieces have reached goal than player's pieces
-        } else {
-            value = 0; // draw
-        }
+        console.log("Value player has lost all pieces ", value);
     } else {
         // No clear win/loss — apply heuristic
-        if (currState[winningIndex].includes(yourPlayer)) {
-            const countPlayerRemaining = count(currState, yourPlayer) - countInWinningIndex;
-            const countOpponentRemaining = count(currState, opponent) - countInOpponentIndex;
-            value = countInWinningIndex - countInOpponentIndex + (countPlayerRemaining - countOpponentRemaining);
+        const countPlayerRemaining = totalCountPlayer - countInWinningIndex;
+        const countOpponentRemaining = totalCountOpponent - countInOpponentIndex;
+        if (currState[winningIndex].includes(yourPlayer)
+        && !currState[opponentIndex].includes(opponent)) {
+            // at least one player piece has reached goal but none of opponent's pieces have reached goal
+            // We add the good things and subtract the bad
+            value = countInWinningIndex - totalCountOpponent - countPlayerRemaining;
+            // console.log("Lose all your pieces and take the opponent's");
+        } else if (!currState[winningIndex].includes(yourPlayer)
+        && currState[opponentIndex].includes(opponent)) {
+            // at least one opponent piece reached goal but none of player's pieces have reached goal
+            value = countInWinningIndex - countInOpponentIndex + countOpponentRemaining + countPlayerRemaining;
+            // console.log("Do not lose your pieces and do not take the opponent's");
+        } else if (currState[winningIndex].includes(yourPlayer)
+        && currState[opponentIndex].includes(opponent)) {
+            // both of them have made at least one in
+            value = countInWinningIndex - countInOpponentIndex + countOpponentRemaining - countPlayerRemaining;
+            // console.log("Lose all your pieces and do not take the opponent's");
         } else {
-            value = count(currState, yourPlayer) - count(currState, opponent);
+            // neither of them have made even one in
+            value = totalCountPlayer - totalCountOpponent;
+            // console.log("Do not lose your pieces and take the opponent's");
         }
+        // console.log("Count in winning, opponent, playerRemaining, oppRemaining ", countInWinningIndex, countInOpponentIndex, countPlayerRemaining, countOpponentRemaining);
         // value += positionalScore(currState, yourPlayer) - positionalScore(currState, opponent); // uncomment to improve heuristic
     }
 
@@ -481,8 +498,13 @@ function oskaplayer(currState, player, depth) {
     let maxVal = -Infinity;
     const neighbors = movegen(currState, player);
 
+    if (neighbors.length === 0) {
+        console.log("No valid moves AI can make.");
+        return currState;
+    }
+
     for (const { board } of neighbors) {
-        const value = MinValue(board, player, depth - 1);
+        const value = MinValue(board, player, depth - 1, player);
         if (value > maxVal) {
             maxVal = value;
             bestMove = board;
@@ -491,42 +513,44 @@ function oskaplayer(currState, player, depth) {
     return bestMove;
 }
 
-function MaxValue(currState, player, depth) {
+function MaxValue(currState, player, depth, maxPlayer) {
     const opponent = findOpponent(player);
     const myMoves = movegen(currState, player);
     const oppMoves = movegen(currState, opponent);
 
+    // console.log("Next states = ", myMoves);
+
     if (depth === 0 || (myMoves.length === 0 && oppMoves.length === 0)) {
-        return findValue(currState, player);
+        return findValue(currState, maxPlayer);
     }
 
     if (myMoves.length === 0 && oppMoves.length > 0) {
-        return MaxValue(currState, opponent, depth - 1);
+        return MinValue(currState, opponent, depth - 1, maxPlayer);
     }
 
     let value = -Infinity;
     for (const { board } of myMoves) {
-        value = Math.max(value, MinValue(board, player, depth - 1));
+        value = Math.max(value, MinValue(board, opponent, depth - 1, maxPlayer));
     }
     return value;
 }
 
-function MinValue(currState, player, depth) {
+function MinValue(currState, player, depth, maxPlayer) {
     const opponent = findOpponent(player);
-    const myMoves = movegen(currState, player);
-    const oppMoves = movegen(currState, opponent);
+    const myMoves = movegen(currState, player);  // 'player' is now the opponent of maxPlayer
+    const oppMoves = movegen(currState, opponent);  // maxPlayer's possible moves
 
     if (depth === 0 || (myMoves.length === 0 && oppMoves.length === 0)) {
-        return findValue(currState, player);
+        return findValue(currState, maxPlayer);
     }
 
     if (myMoves.length === 0 && oppMoves.length > 0) {
-        return MinValue(currState, opponent, depth - 1);
+        return MaxValue(currState, opponent, depth - 1, maxPlayer);
     }
 
     let value = Infinity;
     for (const { board } of myMoves) {
-        value = Math.min(value, MaxValue(board, player, depth - 1));
+        value = Math.min(value, MaxValue(board, opponent, depth - 1, maxPlayer));
     }
     return value;
 }
@@ -535,11 +559,11 @@ function MinValue(currState, player, depth) {
 ////////////////// Testing with fake board states ////////////////
 // Simple test - opening position (starting position)
 const board1 = [
-  ["w", "w", "w", "w"],
+  ["-", "w", "w", "w"],
+  ["w", "-", "-"],
+  ["b", "-"],
   ["-", "-", "-"],
-  ["-", "-"],
-  ["-", "-", "-"],
-  ["b", "b", "b", "b"]
+  ["b", "-", "b", "b"]
 ];
 
 // Slightly advanced - white about to jump a black pawn

@@ -1,6 +1,6 @@
 let selectedPiece = null;
 let legalMoves = [];
-let searchDepth = 3;
+let searchDepth = 10;
 let userPlayer = "b";
 let computerPlayer = "w";
 let gameOver = false;
@@ -192,6 +192,8 @@ function checkWin(board) {
         if (board[bottomRow][i] === computerPlayer) {
             computerPiecesInGoal++;
             if (computerPiecesInGoal === totalComputerPieces) {
+                console.log("Computer pieces in goal = ", computerPiecesInGoal);
+                console.log("Total computer pieces ", totalComputerPieces);
                 showWinner("AI wins!", "Looks like my Oska bot outsmarted you this time.");
                 gameOver = true;
                 return true;
