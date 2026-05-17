@@ -1,6 +1,6 @@
 let selectedPiece = null;
 let legalMoves = [];
-let searchDepth = 8;
+let searchDepth = 11;
 let userPlayer = "b";
 let computerPlayer = "w";
 let gameOver = false;
